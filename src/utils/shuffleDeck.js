@@ -110,7 +110,6 @@ const evaluateHand = (hand) => {
   if (isStraight) return "straight";
   if (counts[0] === 3) return "threeOfAKind";
   if (counts[0] === 2 && counts[1] === 2) return "twoPair";
-  if (counts[0] === 2) return "onePair";
   else return "NoWin";
 };
 
