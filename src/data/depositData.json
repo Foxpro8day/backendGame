@@ -1,0 +1,14 @@
+[
+  {
+    "bankName": "Vietcombank",
+    "accountNumber": "123456789",
+    "accountName": "Nguyen Van A",
+    "branch": "Hà Nội"
+  },
+  {
+    "bankName": "Techcombank",
+    "accountNumber": "987654321",
+    "accountName": "Tran Van B",
+    "branch": "Hồ Chí Minh"
+  }
+]
