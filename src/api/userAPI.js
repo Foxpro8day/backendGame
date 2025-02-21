@@ -127,7 +127,6 @@ router.get("/me", authMiddleware, async (req, res) => {
 router.post("/register", async (req, res) => {
   try {
     const { username, phone, password } = req.body;
-
     // ✅ Kiểm tra dữ liệu đầu vào
     if (!username || !phone || !password) {
       return res
@@ -249,6 +248,71 @@ router.post("/withdraw", authMiddleware, async (req, res) => {
   } catch (error) {
     console.error("❌ Lỗi rút tiền:", error);
     res.status(500).json({ message: "❌ Lỗi server!" });
+  }
+});
+
+router.post("/transfer", async (req, res) => {
+  const { userId, value, amount } = req.body;
+  console.log(req.body)
+
+  // Kiểm tra dữ liệu đầu vào
+  if (!userId || !value || !amount || amount <= 0) {
+    return res.status(400).json({ error: "Dữ liệu không hợp lệ!" });
+  }
+
+  const transaction = await db.sequelize.transaction(); // ✅ Tạo transaction để đảm bảo tính toàn vẹn
+
+  try {
+    // ✅ Tìm user trong database
+    const user = await User.findByPk(userId, { transaction });
+
+    if (!user) {
+      await transaction.rollback();
+      return res.status(404).json({ error: "Không tìm thấy người dùng!" });
+    }
+
+    // ✅ Xử lý chuyển đổi dựa trên `value`
+    if (value === "option1") {
+      if (user.credit < amount) {
+        await transaction.rollback();
+        return res
+          .status(400)
+          .json({ error: "Không đủ Credit để thực hiện giao dịch!" });
+      }
+      await User.update(
+        { credit: user.credit - amount, point: user.point + amount },
+        { where: { id: userId }, transaction }
+      );
+    } else if (value === "option2") {
+      if (user.point < amount) {
+        await transaction.rollback();
+        return res
+          .status(400)
+          .json({ error: "Không đủ Point để thực hiện giao dịch!" });
+      }
+      await User.update(
+        { credit: user.credit + amount, point: user.point - amount },
+        { where: { id: userId }, transaction }
+      );
+    } else {
+      await transaction.rollback();
+      return res.status(400).json({ error: "Loại chuyển đổi không hợp lệ!" });
+    }
+
+    // ✅ Lấy thông tin mới sau khi cập nhật
+    const updatedUser = await User.findByPk(userId, { transaction });
+
+    await transaction.commit(); // ✅ Hoàn tất transaction
+
+    res.json({
+      message: "Chuyển đổi thành công!",
+      credit: updatedUser.credit,
+      point: updatedUser.point,
+    });
+  } catch (error) {
+    await transaction.rollback();
+    console.error("Lỗi khi thực hiện chuyển đổi:", error);
+    res.status(500).json({ error: "Lỗi hệ thống! Vui lòng thử lại sau." });
   }
 });
 

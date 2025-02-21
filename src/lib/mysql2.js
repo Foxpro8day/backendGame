@@ -1,21 +1,29 @@
 const mysql = require("mysql");
 const dotenv = require("dotenv");
 
-// dotenv.config(); // Load biến môi trường từ .env
+dotenv.config(); // Load biến môi trường từ .env
 
-const connectMysqlDB2 = mysql.createConnection({
-  host: process.env.DB_HOST2 || "localhost",
-  user: process.env.DB_USER2 || "root",
-  password: process.env.DB_PASS2 || "",
-  database: process.env.DB_NAME2 || "test",
-});
+const createMysqlGameConnection2 = () => {
+  return new Promise((resolve, reject) => {
+    const connection = mysql.createConnection({
+      host: process.env.DB_HOST2 || "localhost",
+      user: process.env.DB_USER2 || "root",
+      password: process.env.DB_PASS2 || "",
+      database: process.env.DB_NAME2 || "test",
+    });
 
-connectMysqlDB2.connect((err) => {
-  if (err) {
-    console.error("❌ Database game connection failed:", err);
-    return;
-  }
-  console.log(`✅ Connected to MySQL game ${process.env.DB_NAME2}`);
-});
+    connection.connect((err) => {
+      if (err) {
+        console.error("❌ Database game connection failed:", err);
+        reject(err);
+      } else {
+        console.log(
+          `✅ Connected to MySQL game database: ${process.env.DB_NAME2}`
+        );
+        resolve(connection);
+      }
+    });
+  });
+};
 
-module.exports = connectMysqlDB2;
+module.exports = createMysqlGameConnection2;
