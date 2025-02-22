@@ -10,11 +10,11 @@ const GameStage = {
 
 // ✅ Xóc Đĩa possible outcomes
 const XOC_DIA_RESULTS = {
-  "4_RED": ["Red", "Red", "Red", "Red"],
-  "3_RED_1_WHITE": ["Red", "Red", "Red", "White"],
-  "2_RED_2_WHITE": ["Red", "Red", "White", "White"],
-  "1_RED_3_WHITE": ["Red", "White", "White", "White"],
-  "4_WHITE": ["White", "White", "White", "White"],
+  RED4: ["Red", "Red", "Red", "Red"],
+  RED3_WHITE1: ["Red", "Red", "Red", "White"],
+  RED2_WHITE2: ["Red", "Red", "White", "White"],
+  RED1_WHITE3: ["Red", "White", "White", "White"],
+  WHITE4: ["White", "White", "White", "White"],
   ODD: null, // Represents odd count of Red coins
   EVEN: null, // Represents even count of Red coins
 };
@@ -30,7 +30,7 @@ let totalMoney = Object.fromEntries(
 // ✅ Initialize game state
 let gameState = {
   round: 1,
-  result: "4_RED",
+  result: "RED4",
   oddEvenResult: "EVEN",
   coinFaces: ["Red", "Red", "Red", "Red"],
   bets: Object.fromEntries(
@@ -51,19 +51,19 @@ const shakePlateAndCalculateResult = () => {
   let result;
   switch (redCount) {
     case 4:
-      result = "4_RED";
+      result = "RED4";
       break;
     case 3:
-      result = "3_RED_1_WHITE";
+      result = "RED3_WHITE1";
       break;
     case 2:
-      result = "2_RED_2_WHITE";
+      result = "RED2_WHITE2";
       break;
     case 1:
-      result = "1_RED_3_WHITE";
+      result = "RED1_WHITE3";
       break;
     case 0:
-      result = "4_WHITE";
+      result = "WHITE4";
       break;
   }
 
@@ -86,7 +86,7 @@ const initializeGameState = async () => {
 
       gameState = {
         round: lastGame.gameId + 1,
-        result: lastGame.result?.result || "4_RED",
+        result: lastGame.result?.result || "RED4",
         oddEvenResult: lastGame.result?.oddEvenResult || "EVEN",
         coinFaces: lastGame.result?.coinFaces || ["Red", "Red", "Red", "White"],
         bets: Object.fromEntries(
@@ -153,7 +153,7 @@ const startNewRound = (io) => {
 // ✅ Process shaking
 const processRoundResult = (io) => {
   gameState.gameStage = GameStage.ROLLING;
-  let rollingCountdown = 3;
+  let rollingCountdown = 5;
 
   const rollingInterval = setInterval(() => {
     sendGameStateToClients(io, rollingCountdown);
@@ -199,10 +199,18 @@ const finalizeRound = async (io) => {
   setTimeout(() => startNextRoundCountdown(io), 5000);
 };
 
-// ✅ Wait for next round
+// ✅ Wait for next round với countdown đếm ngược từ 10 giây
 const startNextRoundCountdown = (io) => {
   gameState.gameStage = GameStage.WAITING;
-  setTimeout(() => startNewRound(io), 10000);
+  let waitingCountdown = 10;
+  const waitingInterval = setInterval(() => {
+    sendGameStateToClients(io, waitingCountdown);
+    waitingCountdown--;
+    if (waitingCountdown < 0) {
+      clearInterval(waitingInterval);
+      startNewRound(io);
+    }
+  }, 1000);
 };
 
 // ✅ Reset game state
