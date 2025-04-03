@@ -167,7 +167,7 @@ const finalizeRound = async (io) => {
     await GameHistory.create(gameData);
     // console.log("✅ Lưu kết quả vào DB thành công!");
   } catch (error) {
-    console.error("❌ Lỗi khi lưu kết quả vào DB:", error);
+    console.error("❌ Lỗi khi lưu kết quả vào DB bc:", error);
   }
 
   sendGameStateToClients(io, 5);

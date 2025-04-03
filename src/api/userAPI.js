@@ -5,6 +5,7 @@ const db = require("../../models"); // ✅ Import toàn bộ models
 const User = db.db1.User; // ✅ Lấy model `User`
 const LuckyWheelMember = db.db1.LuckyWheelMember; // Lấy model đúng cách
 const fs = require("fs")
+const path = require("path");
 
 const router = express.Router();
 const SECRET_KEY = process.env.SECRET_KEY; // Thay bằng secret key bảo mật
@@ -13,6 +14,8 @@ const {
   adminMiddleware,
   subAdminMiddleware,
 } = require("../../middleware/authMiddleware");
+
+const vinhdanhPath = path.join(__dirname, "../data/rewardTable.json");
 
 router.post("/login", async (req, res) => {
   try {
@@ -316,6 +319,19 @@ router.post("/transfer", async (req, res) => {
   }
 });
 
+router.get("/vinh-danh", (req, res) => {
+  fs.readFile(vinhdanhPath, "utf8", (err, data) => {
+      if (err) {
+          return res.status(500).json({ error: "Không thể đọc file JSON" });
+      }
+      try {
+          const jsonData = JSON.parse(data);
+          res.json(jsonData);
+      } catch (error) {
+          res.status(500).json({ error: "Lỗi phân tích dữ liệu JSON" });
+      }
+  });
+});
 
 router.post("/logout", (req, res) => {
   res.clearCookie("token", { httpOnly: true, secure: false });

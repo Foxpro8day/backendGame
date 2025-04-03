@@ -192,7 +192,7 @@ const finalizeRound = async (io) => {
     await GameHistory.create(gameData);
     // console.log("✅ Successfully saved game result to DB!");
   } catch (error) {
-    console.error("❌ Error saving game result to DB:", error);
+    console.error("❌ Error saving game result to DB xd:", error);
   }
 
   sendGameStateToClients(io, 5);

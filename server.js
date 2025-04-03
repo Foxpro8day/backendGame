@@ -11,7 +11,6 @@ const connectMysqlDB2 = require("./src/lib/mysql2"); // ✅ Import kết nối M
 const connectMysqlDB3 = require("./src/lib/mysql3"); // ✅ Import kết nối MySQL bc
 const connectMysqlDB4 = require("./src/lib/mysql4"); // ✅ Import kết nối MySQL xd
 const connectMysqlDB5 = require("./src/lib/mysql5"); // ✅ Import kết nối MySQL pr
-const connectMongoDB = require("./src/lib/mongo"); // ✅ Import MongoDB connection
 
 //import logicgame
 const {
@@ -149,7 +148,6 @@ function getDefaultXocDiaState() {
     await connectMysqlDB3();
     await connectMysqlDB4();
     await connectMysqlDB5();
-    await connectMongoDB();
     console.log("✅ Kết nối Database thành công");
   } catch (error) {
     console.error("❌ Lỗi kết nối Database:", error);
